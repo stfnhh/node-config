@@ -42,7 +42,9 @@ class Vault {
   _inferConfigFilePath(configFilePath) {
     if (configFilePath) return configFilePath;
     if (fs.existsSync('config.yaml')) return 'config.yaml';
+    if (fs.existsSync('config.yaml.enc')) return 'config.yaml';
     if (fs.existsSync('config.yml')) return 'config.yml';
+    if (fs.existsSync('config.yml.enc')) return 'config.yml';
     return 'config.yaml';
   }
 
@@ -80,20 +82,21 @@ class Vault {
       iv = null;
     }
     const cipherBundle = await this.encryptFnc(masterKey, text, iv);
-    fs.writeFileSync(`${this.configFilePath}`, cipherBundle);
+    fs.writeFileSync(`${this.configFilePath}.enc`, cipherBundle);
     try {
       fs.unlinkSync(`${this.configFilePath}.iv`, 'utf8');
     } catch {}
-
+    fs.unlinkSync(`${this.configFilePath}`)
     return `${this.configFilePath}`;
   }
 
   decryptFile() {
     const masterKey = this.getMasterKey(true);
-    const text = fs.readFileSync(`${this.configFilePath}`, 'utf8');
+    const text = fs.readFileSync(`${this.configFilePath}.enc`, 'utf8');
     const [decryptConfig, iv] = this.decryptFnc(masterKey, text);
     fs.writeFileSync(`${this.configFilePath}`, decryptConfig, 'utf8');
     fs.writeFileSync(`${this.configFilePath}.iv`, iv, 'utf8');
+    fs.unlinkSync(`${this.configFilePath}.enc`)
     return this.configFilePath;
   }
 
