@@ -8,114 +8,98 @@ class Vault {
   constructor({
     decryptFnc,
     encryptFnc,
-    credentialsFilePath,
+    configFilePath,
     nodeEnv = process.env.NODE_CREDENTIALS_ENV || process.env.NODE_ENV || 'development',
     masterKey,
   } = {}) {
-    this.credentialsFilePath = this._inferCredentialsFilePath(credentialsFilePath);
-    this.format = this._inferFormat();
+    this.configFilePath = this._inferConfigFilePath(configFilePath);
+    this.format = "yaml";
     const adapter = this._getAdapter(decryptFnc, encryptFnc);
     this.decryptFnc = adapter.decryptFnc;
     this.encryptFnc = adapter.encryptFnc;
     this.parser = adapter.parser;
     this.masterKey = masterKey;
-    this._credentials = {};
-    this._credentialsEnv = {};
+    this._config = {};
+    this._env = {};
     this.nodeEnv = nodeEnv === '' ? 'development' : nodeEnv;
     this.configured = false;
   }
 
-  get credentials() {
+  get config() {
     if (!this.configured) {
-      this.config();
+      this.configuration();
     }
-    return this._credentials;
+    return this._config;
   }
 
-  get credentialsEnv() {
+  get env() {
     if (!this.configured) {
-      this.config();
+      this.configuration();
     }
-    return this._credentialsEnv;
+    return this._env;
   }
 
-  _inferCredentialsFilePath(credentialsFilePath) {
-    if (credentialsFilePath) return credentialsFilePath;
-    if (fs.existsSync('credentials.json')) return 'credentials.json';
-    if (fs.existsSync('credentials.yaml')) return 'credentials.yaml';
-    if (fs.existsSync('credentials.yml')) return 'credentials.yml';
-    return 'credentials.json';
-  }
-
-  _inferFormat() {
-    if (/^.*\.(json)$/.test(this.credentialsFilePath)) {
-      return 'json';
-    }
-    return 'yaml';
+  _inferConfigFilePath(configFilePath) {
+    if (configFilePath) return configFilePath;
+    if (fs.existsSync('config.yaml')) return 'config.yaml';
+    if (fs.existsSync('config.yml')) return 'config.yml';
+    return 'config.yaml';
   }
 
   _getAdapter(decryptFnc, encryptFnc) {
-    if (decryptFnc && encryptFnc) {
-      return { parser: JSON, decryptFnc, encryptFnc };
-    } else if (this.format === 'json') {
-      return { parser: JSON, decryptFnc: core.decryptJSON, encryptFnc: core.encryptJSON };
-    } else if (this.format === 'yaml') {
-      return { parser: YAML, decryptFnc: core.decryptYAML, encryptFnc: core.encryptYAML };
-    } else {
-      return { parser: JSON, decryptFnc: core.decrypt, encryptFnc: core.encrypt };
-    }
+    return { parser: YAML, decryptFnc: core.decryptYAML, encryptFnc: core.encryptYAML };
   }
 
-  setCredentials(credentials) {
-    this._credentials = { ...credentials };
-    this._credentialsEnv = get(credentials, this.nodeEnv, {});
+  setConfig(config) {
+    this._config = { ...config };
+    this._env = get(config, this.nodeEnv, {});
   }
 
-  config({ masterKey, path, nodeEnv } = {}) {
+  configuration({ masterKey, path, nodeEnv } = {}) {
     if (masterKey) this.masterKey = masterKey;
-    if (path) this.credentialsFilePath = path;
+    if (path) this.configFilePath = path;
     if (nodeEnv) this.nodeEnv = this.nodeEnv;
 
     const key = this.getMasterKey();
-    const text = fs.readFileSync(`${this.credentialsFilePath}`, 'utf8');
-    const [credentialsText, iv] = this.decryptFnc(key, text);
-    const credentialsTextRendered = render(credentialsText);
-    const credentials = this.parser.parse(credentialsTextRendered);
-    this.setCredentials(credentials);
+    const text = fs.readFileSync(`${this.configFilePath}`, 'utf8');
+    const [configText, iv] = this.decryptFnc(key, text);
+    const configTextRendered = render(configText);
+    const config = this.parser.parse(configTextRendered);
+    this.setConfig(config);
     this.configured = true;
-    return credentials;
+    return config;
   }
 
   async encryptFile() {
     const masterKey = this.getMasterKey(true);
-    const text = fs.readFileSync(this.credentialsFilePath, 'utf8').trim();
+    const text = fs.readFileSync(this.configFilePath, 'utf8').trim();
     let iv;
     try {
-      iv = fs.readFileSync(`${this.credentialsFilePath}.iv`, 'utf8').trim();
+      iv = fs.readFileSync(`${this.configFilePath}.iv`, 'utf8').trim();
     } catch {
       iv = null;
     }
     const cipherBundle = await this.encryptFnc(masterKey, text, iv);
-    fs.writeFileSync(`${this.credentialsFilePath}`, cipherBundle);
+    fs.writeFileSync(`${this.configFilePath}`, cipherBundle);
     try {
-      fs.unlinkSync(`${this.credentialsFilePath}.iv`, 'utf8');
+      fs.unlinkSync(`${this.configFilePath}.iv`, 'utf8');
     } catch {}
 
-    return `${this.credentialsFilePath}`;
+    return `${this.configFilePath}`;
   }
 
   decryptFile() {
     const masterKey = this.getMasterKey(true);
-    const text = fs.readFileSync(`${this.credentialsFilePath}`, 'utf8');
-    const [decryptCredentials, iv] = this.decryptFnc(masterKey, text);
-    fs.writeFileSync(`${this.credentialsFilePath}`, decryptCredentials, 'utf8');
-    fs.writeFileSync(`${this.credentialsFilePath}.iv`, iv, 'utf8');
-    return this.credentialsFilePath;
+    const text = fs.readFileSync(`${this.configFilePath}`, 'utf8');
+    const [decryptConfig, iv] = this.decryptFnc(masterKey, text);
+    fs.writeFileSync(`${this.configFilePath}`, decryptConfig, 'utf8');
+    fs.writeFileSync(`${this.configFilePath}.iv`, iv, 'utf8');
+    return this.configFilePath;
   }
 
   createNewKey() {
     const newKey = core.newKey();
-    fs.writeFileSync(`${this.credentialsFilePath}.key`, newKey);
+    fs.writeFileSync(`${this.configFilePath}.key`, newKey);
     return newKey;
   }
 
@@ -124,7 +108,7 @@ class Vault {
       return (
         this.masterKey ||
         process.env.NODE_MASTER_KEY ||
-        fs.readFileSync(`${this.credentialsFilePath}.key`, 'utf8').trim()
+        fs.readFileSync(`${this.configFilePath}.key`, 'utf8').trim()
       );
     } catch (e) {
       if (force) {

@@ -8,19 +8,19 @@ declare class Vault {
   constructor(options: {
     encryptFnc?: (encKey: string, text: string, ivBase64?: string) => string;
     decryptFnc?: (encKey: string, text: string) => [string, string];
-    credentialsFilePath?: string;
+    configFilePath?: string;
     nodeEnv?: string;
     masterKey?: string;
   });
 
-  credentials: any;
-  credentialsEnv: any;
-  config(options?: IConfigOptions): any;
+  config: any;
+  env: any;
+  _config(options?: IConfigOptions): any;
 }
 declare const vault: Vault;
-declare const credentials: any;
-declare const credentialsEnv: any;
-declare const config: (options?: IConfigOptions) => any;
+declare const config: any;
+declare const env: any;
+declare const configuration: (options?: IConfigOptions) => any;
 
-export { credentials, credentialsEnv, config, Vault };
+export { config, env, configuration, Vault };
 export default vault;

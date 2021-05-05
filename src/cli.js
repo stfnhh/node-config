@@ -4,17 +4,17 @@ const Vault = require('./vault').Vault;
 const { editContentInEditor } = require('./editContentInEditor');
 
 const init = ({ path }) => {
-  const vault = new Vault({ credentialsFilePath: path });
-  if (fs.existsSync(`${vault.credentialsFilePath}.key`)) {
-    console.log('Warning credentials.json.key exists, delete credentials.json.key to generate new key');
+  const vault = new Vault({ configFilePath: path });
+  if (fs.existsSync(`${vault.configFilePath}.key`)) {
+    console.log('Warning config.yaml.key exists, delete config.yaml.key to generate new key');
   } else {
     const masterKey = vault.getMasterKey(false) || vault.createNewKey();
-    fs.writeFileSync(`${vault.credentialsFilePath}.key`, masterKey);
+    fs.writeFileSync(`${vault.configFilePath}.key`, masterKey);
     vault
       .encryptFile()
       .then(() => {
         try {
-          fs.unlinkSync(`${vault.credentialsFilePath}.iv`);
+          fs.unlinkSync(`${vault.configFilePath}.iv`);
         } catch {}
       })
       .catch((error) => console.error(error));
@@ -22,7 +22,7 @@ const init = ({ path }) => {
 };
 
 const encrypt = async ({ path }) => {
-  const vault = new Vault({ credentialsFilePath: path });
+  const vault = new Vault({ configFilePath: path });
   vault
     .encryptFile()
     .then(() => {})
@@ -30,21 +30,21 @@ const encrypt = async ({ path }) => {
 };
 
 const edit = async ({ path }) => {
-  const vault = new Vault({ credentialsFilePath: path });
+  const vault = new Vault({ configFilePath: path });
   const masterKey = vault.getMasterKey();
 
   try {
-    const [content, iv] = vault.decryptFnc(masterKey, fs.readFileSync(vault.credentialsFilePath, 'utf-8'));
+    const [content, iv] = vault.decryptFnc(masterKey, fs.readFileSync(vault.configFilePath, 'utf-8'));
     const mewContent = await editContentInEditor(content);
     const encyptedContent = await vault.encryptFnc(masterKey, mewContent, iv);
-    fs.writeFileSync(vault.credentialsFilePath, encyptedContent);
+    fs.writeFileSync(vault.configFilePath, encyptedContent);
   } catch (err) {
     console.error(err);
   }
 };
 
 const decrypt = ({ path }) => {
-  const vault = new Vault({ credentialsFilePath: path });
+  const vault = new Vault({ configFilePath: path });
   vault.decryptFile();
 };
 
@@ -52,7 +52,7 @@ const help = () => {
   const sections = [
     {
       header: 'node-vault',
-      content: 'encrypted your credentials',
+      content: 'encrypted your config',
     },
     {
       header: 'Synopsis',
@@ -64,16 +64,16 @@ const help = () => {
         { name: 'help', summary: 'help' },
         {
           name: 'init',
-          summary: 'encrypt your credentials file and create a credentials key file',
+          summary: 'encrypt your config file and create a config key file',
         },
-        { name: 'encrypt', summary: 'encrypt credentials file' },
-        { name: 'decrypt', summary: 'decrypt credentials file' },
+        { name: 'encrypt', summary: 'encrypt config file' },
+        { name: 'decrypt', summary: 'decrypt config file' },
         { name: 'edit', summary: 'decrypt/encrypt in text editor' },
       ],
     },
     {
       header: 'Options',
-      content: [{ name: '-p, --path', summary: 'Path for credentials file' }],
+      content: [{ name: '-p, --path', summary: 'Path for config file' }],
     },
   ];
   const usage = commandLineUsage(sections);

@@ -6,15 +6,15 @@ Inspired in [Rails encrypted secrets management](https://rubyinrails.com/2018/02
 ## Install
 
 ```
-npm install node-credentials --save
+npm install node-config --save
 ```
 
 ## Usage
 
-### Encrypt and decrypt json|yaml files
+### Encrypt and decrypt yaml files
 
 ```yaml
-# credentials.yaml
+# config.yaml
 username: user
 password': myPassword
 ```
@@ -22,7 +22,7 @@ password': myPassword
 - Encrypt
 
 ```
-NODE_MASTER_KEY=$MASTER_KEY npx node-credentials encrypt --path credentials.yaml
+NODE_MASTER_KEY=$MASTER_KEY npx node-config encrypt --path config.yaml
 ```
 
 Only encrypted object values.
@@ -35,12 +35,12 @@ password: +C4M+xFxOQXTyvPJ7QSJuQ==--eYed5TIh3D+9rjN/usOB0w==
 - Decrypt
 
 ```
-NODE_MASTER_KEY=$MASTER_KEY npx node-credentials decrypt --path credentials.yaml
+NODE_MASTER_KEY=$MASTER_KEY npx node-config decrypt --path config.yaml
 ```
 
 ## Setup for NodeJs projects
 
-Create a credentials.json or credentials.yaml file
+Create a config.yaml file
 
 Example:
 
@@ -61,29 +61,29 @@ or
 ```
 
 ```
-npx node-credentials init
+npx node-config init
 ```
 
 OR use your own key
 
 ```
-NODE_MASTER_KEY=$MASTER_KEY npx node-credentials init
+NODE_MASTER_KEY=$MASTER_KEY npx node-config init
 ```
 
-Your credentials file it's encrypted, and generate credentials key file
+Your config file it's encrypted, and generate config key file
 
 Save the key value, and ignore this file in your version control.
 
 ```
-echo credentials.yaml.key >> .gitignore
+echo config.yaml.key >> .gitignore
 ```
 
-### Read credentials in runtime
+### Read config in runtime
 
 ```js
-const { credentials } = require('node-credentials');
+const { config } = require('node-config');
 
-const apiKey = credentials.apiKey;
+const apiKey = config.apiKey;
 ```
 
 ### Use in production
@@ -94,17 +94,17 @@ You can set a environment varible NODE_MASTER_KEY for decrypt secrets.
 NODE_MASTER_KEY=my-credential-key server.js
 ```
 
-### Edit credentials
+### Edit config
 
 The edit command allow to edit the file in a text editor; decrypting before open the file and encrypting after close the file.
 
 ```
-EDITOR=nano npx node-credentials edit
+EDITOR=nano npx node-config edit
 ```
 
-### credentialsEnv
+### env
 
-Return the value of credentials based on process.env.NODE_CREDENTIALS_ENV or process.env.NODE_ENV
+Return the value of config based on process.env.NODE_CREDENTIALS_ENV or process.env.NODE_ENV
 Example:
 
 ```yaml
@@ -121,11 +121,11 @@ production:
 - By default use development key
 
 ```js
-const vault = require('node-credentials');
+const vault = require('node-config');
 
-vault.credentials;
+vault.config;
 // { development: { key: "password_development" }, production: { key: "password_production" } }
-vault.credentialsEnv;
+vault.env;
 // { key: "password_development" }
 ```
 
@@ -142,16 +142,16 @@ NODE_CREDENTIALS_ENV=us.development node main.js
 ```
 
 ```javascript
-const vault = require('node-credentials');
-vault.credentialsEnv;
+const vault = require('node-config');
+vault.env;
 // { key: "development password for US country" }
 ```
 
-### Environment variable in credentials file
+### Environment variable in config file
 
-Some credentials it's not recomend set in credentials file, like production database password.
+Some config it's not recomend set in config file, like production database password.
 
-credentials file accept template variables for process env object
+config file accept template variables for process env object
 
 ```yaml
 production:
@@ -165,12 +165,12 @@ production:
 Command List
 
   help      help
-  init      encrypt your credentials file and create a credentials key file
-  encrypt   encrypt credentials file
-  decrypt   decrypt credentials file
+  init      encrypt your config file and create a config key file
+  encrypt   encrypt config file
+  decrypt   decrypt config file
   edit      decrypt/encrypt in text editor
 
 Options
 
-  -p, --path   Path for credentials file
+  -p, --path   Path for config file
 ```
