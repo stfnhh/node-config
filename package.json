@@ -1,5 +1,5 @@
 {
-  "name": "node-credentials",
+  "name": "node-config",
   "version": "1.3.1",
   "description": "Encrypted yaml for manage configuration variables, similar to rails encrypted secrets",
   "main": "src/index.js",
@@ -8,7 +8,7 @@
     "debug": "node --inspect-brk test/console.js",
     "test": "jest  --reporters=default --reporters=jest-junit --collect-coverage"
   },
-  "repository": "https://github.com/MiguelSavignano/node-credentials",
+  "repository": "https://github.com/stfnhh/node-config",
   "keywords": [
     "secrets",
     "encrypted",
