@@ -23,6 +23,11 @@ class Vault {
     this._env = {};
     this.nodeEnv = nodeEnv === '' ? 'development' : nodeEnv;
     this.configured = false;
+    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
+    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
+    console.log(this.nodeEnv)
+    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
+    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
   }
 
   get config() {

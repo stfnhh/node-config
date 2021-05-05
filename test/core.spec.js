@@ -6,16 +6,16 @@ require('./helpers/matchers');
 describe('core', () => {
   let NODE_MASTER_KEY = '8aa93853b3ff01c5b5447529a9c33cb9';
   const SHORT_NODE_MASTER_KEY = '12345678';
-  let credentials = { key: 'value' };
-  let credentialsString = JSON.stringify(credentials);
+  let config = { key: 'value' };
+  let configString = JSON.stringify(config);
 
   test('encrypt', () => {
-    const result = core.encrypt(NODE_MASTER_KEY, credentialsString, "SlFF0O9iHgKpcds+/6nbEg==");
+    const result = core.encrypt(NODE_MASTER_KEY, configString, "SlFF0O9iHgKpcds+/6nbEg==");
     expect(result).validEncrypted();
   });
 
   test('encrypt with any key length', () => {
-    const result = core.encrypt(SHORT_NODE_MASTER_KEY, credentialsString, "SlFF0O9iHgKpcds+/6nbEg==");
+    const result = core.encrypt(SHORT_NODE_MASTER_KEY, configString, "SlFF0O9iHgKpcds+/6nbEg==");
     expect(result).validEncrypted();
   });
 
@@ -73,7 +73,7 @@ describe('core', () => {
       NODE_MASTER_KEY,
       'dwAhexc3PhUrX9i4gutpy6Hb8endKm7hMCQALPspYEc=--84X822lxzoPbO9Jh2knEGA=='
     );
-    expect(JSON.parse(result)).toEqual(credentials);
+    expect(JSON.parse(result)).toEqual(config);
   });
 
   test('decrypt  with any key length', async () => {
@@ -81,7 +81,7 @@ describe('core', () => {
       SHORT_NODE_MASTER_KEY,
       'YhSWFEmk0OOG1qQDmjkEjg==--hfHcXE55MQ0bDOHho2SLag=='
     );
-    expect(JSON.parse(result)).toEqual(credentials);
+    expect(JSON.parse(result)).toEqual(config);
   });
 
   test('newKey', () => {
