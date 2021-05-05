@@ -1,4 +1,4 @@
-const ENCRYPTED_CONFIG_BY_COUNTRY = {
+const ENCRYPTED_CREDENTIALS_BY_COUNTRY = {
   es: {
     development: {
       myKey: 'FDeejskyJNoZmRmQTPREHA==--SlFF0O9iHgKpcds+/6nbEg==',
@@ -23,7 +23,7 @@ const ENCRYPTED_CONFIG_BY_COUNTRY = {
   },
 };
 
-const ENCRYPTED_CONFIG_BY_ENV = {
+const ENCRYPTED_CREDENTIALS_BY_ENV = {
   development: {
     myKey: 'lS0EEUI3YfnJvjNlQUq8NQrHSWNIW7OupQPYWMl8CJI=--q5V4y7tw2m84/faTZ8iQUA==',
   },
@@ -35,19 +35,19 @@ const ENCRYPTED_CONFIG_BY_ENV = {
   },
 };
 
-const ENCRYPTED_CONFIG = {
+const ENCRYPTED_CREDENTIALS = {
   myKey: 'Gum+XHqHtKmFG5kojUpAZg==--gxV2qVVHRWNn9AqrSQ6MTA==',
   myKeyEnv: 'yTwUP5dm9regseZ4KSiIeqp2fgLhSmW0FmzsFNpWvcQk6jmMyStKkDknXm0WxsO2--gxV2qVVHRWNn9AqrSQ6MTA==',
 };
 
-const DECRYPTED_CONFIG = {
+const DECRYPTED_CREDENTIALS = {
   myKey: 'password',
   myKeyEnv: '<%= process.env.ENV_CREDENTIAL %>',
 };
 
 module.exports = {
-  ENCRYPTED_CONFIG_BY_ENV,
-  ENCRYPTED_CONFIG_BY_COUNTRY,
-  ENCRYPTED_CONFIG,
-  DECRYPTED_CONFIG,
+  ENCRYPTED_CREDENTIALS_BY_ENV,
+  ENCRYPTED_CREDENTIALS_BY_COUNTRY,
+  ENCRYPTED_CREDENTIALS,
+  DECRYPTED_CREDENTIALS,
 };

@@ -9,7 +9,7 @@ class Vault {
     decryptFnc,
     encryptFnc,
     configFilePath,
-    nodeEnv = process.env.NODE_CREDENTIALS_ENV || process.env.NODE_ENV || 'development',
+    nodeEnv = process.env.NODE_CONFIG_ENV || process.env.NODE_ENV || 'development',
     masterKey,
   } = {}) {
     this.configFilePath = this._inferConfigFilePath(configFilePath);
@@ -23,11 +23,6 @@ class Vault {
     this._env = {};
     this.nodeEnv = nodeEnv === '' ? 'development' : nodeEnv;
     this.configured = false;
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
-    console.log(this.nodeEnv)
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
-    console.log("-=-=-=-=-=-=-=-=-=-=-=-=")
   }
 
   get config() {
