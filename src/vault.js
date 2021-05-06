@@ -63,7 +63,7 @@ class Vault {
     if (nodeEnv) this.nodeEnv = this.nodeEnv;
 
     const key = this.getMasterKey();
-    const text = fs.readFileSync(`${this.configFilePath}`, 'utf8');
+    const text = fs.readFileSync(`${this.configFilePath}.enc`, 'utf8');
     const [configText, iv] = this.decryptFnc(key, text);
     const configTextRendered = render(configText);
     const config = this.parser.parse(configTextRendered);
